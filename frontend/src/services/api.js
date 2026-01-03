@@ -47,14 +47,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Debug logging
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV || process.env.NODE_ENV === 'development') {
       console.error('❌ API Error:', {
         message: error.message,
         url: error.config?.url,
         baseURL: error.config?.baseURL,
         fullURL: error.config ? `${error.config.baseURL}${error.config.url}` : 'unknown',
         status: error.response?.status,
-        statusText: error.response?.statusText
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        errors: error.response?.data?.errors
       });
     }
     

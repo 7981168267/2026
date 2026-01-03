@@ -191,7 +191,14 @@ const UserList = ({ onUserSelect }) => {
         handleClose();
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create user');
+      // Handle validation errors from express-validator
+      if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+        const errorMessages = err.response.data.errors.map(e => e.msg || e.message).join(', ');
+        setError(errorMessages || 'Validation failed. Please check your input.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to create user');
+      }
+      console.error('Create user error:', err.response?.data || err);
     }
   };
 
