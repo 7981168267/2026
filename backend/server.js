@@ -120,13 +120,29 @@ const startServer = async () => {
     console.log('🤖 Automation tasks scheduled\n');
 
     // Start server
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log('═══════════════════════════════════════════════');
       console.log('✅ Server is running successfully!');
       console.log(`📍 Backend API: http://localhost:${PORT}`);
       console.log(`📍 Health Check: http://localhost:${PORT}/api/health`);
       console.log('═══════════════════════════════════════════════\n');
       console.log('💡 Keep this terminal open to keep the server running!\n');
+    });
+
+    // Handle server errors (like port already in use)
+    server.on('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`\n❌ Port ${PORT} is already in use!`);
+        console.error('\n💡 To fix this:');
+        console.error(`   1. Find the process: netstat -ano | findstr :${PORT}`);
+        console.error(`   2. Kill the process: taskkill /F /PID <PID>`);
+        console.error(`   3. Or use the restart script: npm run restart\n`);
+        console.error('Alternatively, you can change the port in your .env file:\n');
+        console.error(`   PORT=5002  # Use a different port\n`);
+      } else {
+        console.error('\n❌ Server error:', error.message);
+      }
+      process.exit(1);
     });
   } catch (error) {
     console.error('\n❌ Failed to start server:', error.message);
